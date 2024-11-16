@@ -14,7 +14,17 @@ import time
 import ttkthemes
 from tkinter import ttk
 import pymysql
+import re
 
+def validate_phone(phone_number):
+    # Regular expression for Bangladeshi phone numbers
+    phone_regex = r"^\+8801[3-9]\d{8}$"
+    return re.match(phone_regex, phone_number)
+
+def validate_email(email):
+    # Regular expression for a basic email validation
+    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    return re.match(email_regex, email)
 
 # Function
 def iexit():
@@ -39,18 +49,24 @@ def update_student():
     update_window.resizable(False, False)
 
     def update_data():
+        phone_no = phone_noEntry.get()
+        email = emailEntry.get()
+        std_id = Std_IdEntry.get()
+
         if (
-            Std_IdEntry.get() == ""
+            std_id == ""
             or nameEntry.get() == ""
             or departmentEntry.get() == ""
             or intakeEntry.get() == ""
             or addressEntry.get() == ""
             or emailEntry.get() == ""
-            or phone_noEntry.get() == ""
+            or phone_no == ""
         ):
-            messagebox.showerror(
-                "Error", "All fields must be filled", parent=update_window
-            )
+             messagebox.showerror("Error", "All fields must be filled", parent=update_window)
+        elif not validate_phone(phone_no):
+            messagebox.showerror("Error", "Invalid phone number format. Must be +8801XXXXXXXXX.", parent=update_window)
+        elif not validate_email(email):  # Validate email
+            messagebox.showerror("Error", "Invalid email format. Please enter a valid email address.", parent=update_window)
         else:
             try:
                 query = """UPDATE Student SET Name=%s, Department=%s, Intake=%s, Address=%s, Email=%s,
@@ -63,7 +79,7 @@ def update_student():
                         intakeEntry.get(),
                         addressEntry.get(),
                         emailEntry.get(),
-                        int(phone_noEntry.get()),
+                        phone_noEntry.get(),
                         int(Std_IdEntry.get()),
                     ),
                 )
@@ -209,38 +225,51 @@ def search_student():
 
 def add_student():
     def add_data():
+        phone_no = phone_noEntry.get()
+        email = emailEntry.get()
+        std_id = Std_IdEntry.get()
+
         if (
-            Std_IdEntry.get() == ""
+            std_id == ""
             or nameEntry.get() == ""
             or departmentEntry.get() == ""
             or intakeEntry.get() == ""
             or addressEntry.get() == ""
             or emailEntry.get() == ""
-            or phone_noEntry.get() == ""
+            or phone_no == ""
         ):
-            messagebox.showerror("Error", "All field Must be filled", parent=add_window)
+            messagebox.showerror("Error", "All fields must be filled", parent=add_window)
+        elif not validate_phone(phone_no):
+            messagebox.showerror("Error", "Invalid phone number format. Must be +8801XXXXXXXXX.", parent=add_window)
+        elif not validate_email(email):  # Validate email
+            messagebox.showerror("Error", "Invalid email format. Please enter a valid email address.", parent=add_window)
         else:
             try:
-                query = "insert into Student values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                mycursor.execute(
-                    query,
-                    (
-                        int(Std_IdEntry.get()),
-                        nameEntry.get(),
-                        departmentEntry.get(),
-                        intakeEntry.get(),
-                        addressEntry.get(),
-                        emailEntry.get(),
-                        int(phone_noEntry.get()),
-                    ),
-                )
-                con.commit()
-                result = messagebox.askyesno(
-                    "Confirm",
-                    "Data added successfully. Do you want to clean the form?",
-                    parent=add_window,
-                )
+                # Ensure database is connected
+                check_query = "SELECT * FROM Student WHERE Std_Id = %s"
+                mycursor.execute(check_query, (std_id,))
+                result = mycursor.fetchone()
                 if result:
+                    messagebox.showerror("Error", "Student ID already exists. Please use a unique ID.", parent=add_window)
+                else:
+                    # Insert data
+                    query = "INSERT INTO Student (Std_Id, Name, Department, Intake, Address, Email, Phone_No) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    mycursor.execute(
+                        query,
+                        (
+                            std_id,
+                            nameEntry.get(),
+                            departmentEntry.get(),
+                            intakeEntry.get(),
+                            addressEntry.get(),
+                            emailEntry.get(),
+                            phone_no,
+                        ),
+                    )
+                    con.commit()
+                    messagebox.showinfo("Success", "Student added successfully.", parent=add_window)
+
+                    # Reset form
                     Std_IdEntry.delete(0, END)
                     nameEntry.delete(0, END)
                     departmentEntry.delete(0, END)
@@ -248,21 +277,14 @@ def add_student():
                     addressEntry.delete(0, END)
                     emailEntry.delete(0, END)
                     phone_noEntry.delete(0, END)
-                else:
-                    pass
-            except:
-                messagebox.showerror(
-                    "Error", "Value can't be repeated.", parent=add_window
-                )
-                return
-            query = "select *from Student"
-            mycursor.execute(query)
-            fetched_data = mycursor.fetchall()
-            studentTable.delete(*studentTable.get_children())
-            for data in fetched_data:
-                # dataList=list(data)
-                studentTable.insert("", END, values=data)
 
+                    # Refresh table
+                    view_student()
+            except Exception as e:
+                con.rollback()
+                messagebox.showerror("Error", f"Failed to add student: {str(e)}", parent=add_window)
+
+    # Add Window UI
     add_window = Toplevel()
     add_window.grab_set()
     add_window.resizable(False, False)
@@ -277,9 +299,7 @@ def add_student():
     nameEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
     nameEntry.grid(row=1, column=1, pady=10, padx=40)
 
-    departmentLabel = Label(
-        add_window, text="Department", font=("times new roman", 20, "bold")
-    )
+    departmentLabel = Label(add_window, text="Department", font=("times new roman", 20, "bold"))
     departmentLabel.grid(row=2, column=0, padx=30, pady=10)
     departmentEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
     departmentEntry.grid(row=2, column=1, pady=10, padx=40)
@@ -289,9 +309,7 @@ def add_student():
     intakeEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
     intakeEntry.grid(row=3, column=1, pady=10, padx=40)
 
-    addressLabel = Label(
-        add_window, text="Address", font=("times new roman", 20, "bold")
-    )
+    addressLabel = Label(add_window, text="Address", font=("times new roman", 20, "bold"))
     addressLabel.grid(row=4, column=0, padx=30, pady=10)
     addressEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
     addressEntry.grid(row=4, column=1, pady=10, padx=40)
@@ -301,15 +319,13 @@ def add_student():
     emailEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
     emailEntry.grid(row=5, column=1, pady=10, padx=40)
 
-    phone_noLabel = Label(
-        add_window, text="Phone_No", font=("times new roman", 20, "bold")
-    )
-    phone_noLabel.grid(row=7, column=0, padx=30, pady=10)
+    phone_noLabel = Label(add_window, text="Phone_No", font=("times new roman", 20, "bold"))
+    phone_noLabel.grid(row=6, column=0, padx=30, pady=10)
     phone_noEntry = Entry(add_window, font=("roman", 15, "bold"), width=24)
-    phone_noEntry.grid(row=7, column=1, pady=10, padx=40)
+    phone_noEntry.grid(row=6, column=1, pady=10, padx=40)
 
-    add_student_button = ttk.Button(add_window, text="Add Student", command=add_data)
-    add_student_button.grid(row=9, column=1, pady=10)
+    add_button = ttk.Button(add_window, text="Add Student", command=add_data)
+    add_button.grid(row=7, column=1, pady=20)
 
 
 def connect_database():
