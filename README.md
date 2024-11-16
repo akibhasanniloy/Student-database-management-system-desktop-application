@@ -1,1 +1,1 @@
-# Student-database-management-system
+# Student-database-management-system-Desktop-Application
