@@ -4,7 +4,7 @@
 <h3>Buttons will be activated..</h3> <br>
 <h3 align="center">---> Key features <---</h3>
 <ul>
-<li>1. Add Student</li>
+<li>Add Student</li>
   .Std_Id
   .Name
   .Department
@@ -12,7 +12,7 @@
   .Address
   .Email
   .Phone No
-<li>2. Update Student</li>
+<li>Update Student</li>
   .Std_Id
   .Name
   .Department
@@ -20,9 +20,9 @@
   .Address
   .Email
   .Phone No
-<li>3. Delete Student</li>
+<li>Delete Student</li>
   Before do so tap on that particular profile which you want to delete.
-<li>4. Search Student</li>
+<li>Search Student</li>
   .Std_Id
   .Name
   .Department
