@@ -1,9 +1,10 @@
 # Student-database-management-system-Desktop-Application
-To access this application you must nedd to login.
-Connected to database or Exit the system.
-Buttons will be activated..
---------->Features<---------
-Add Student
+<h3>To access this application you must nedd to login.</h3> <br>
+<h3>Connected to database or Exit the system.</h3> <br>
+<h3>Buttons will be activated..</h3> <br>
+<h3 align="center">---> Key features <---</h3>
+<ul>
+<li>1. Add Student</li>
   .Std_Id
   .Name
   .Department
@@ -11,7 +12,7 @@ Add Student
   .Address
   .Email
   .Phone No
-Update Student
+<li>2. Update Student</li>
   .Std_Id
   .Name
   .Department
@@ -19,9 +20,10 @@ Update Student
   .Address
   .Email
   .Phone No
-Delete Student
+<li>3. Delete Student</li>
   Before do so tap on that particular profile which you want to delete.
-Search Student
+<li>4. Search Student</li>
   .Std_Id
   .Name
   .Department
+</ul>
