@@ -27,3 +27,5 @@
   .Name
   .Department
 </ul>
+<br><br>
+<h3>Student can see their details if they login via their email and pass(1234)</h3>
