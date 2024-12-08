@@ -332,8 +332,8 @@ def connect_database():
     def connect():
         global mycursor, con
         try:
-            # con=pymysql.connect(host=hostEntry.get(), user=usernameEntry.get(), password=passwordEntry.get())
-            con = pymysql.connect(host="localhost", user="root", password="12345")
+            con=pymysql.connect(host=hostEntry.get(), user=usernameEntry.get(), password=passwordEntry.get())
+            # con = pymysql.connect(host="localhost", user="root", password="12345")
             mycursor = con.cursor()
         except:
             messagebox.showerror("Error", "Invalid Details", parent=connectWindow)

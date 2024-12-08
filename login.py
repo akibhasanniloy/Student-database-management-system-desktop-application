@@ -17,14 +17,14 @@ def login():
 
 window=Tk()
 
-window.geometry('1280x700+0+0')
+window.geometry('800x400+0+0')
 window.title('Login')
 
 window.resizable(False, False)
 
 # loginFrame = Frame(window, bg='white')
 loginFrame = Frame(window)
-loginFrame.place(x=400, y=150)
+loginFrame.place(x=100, y=50)
 
 # User Name
 usernameLabel=Label(loginFrame, text='Username', compound=LEFT, font=('times new roman', 20, 'bold'))
